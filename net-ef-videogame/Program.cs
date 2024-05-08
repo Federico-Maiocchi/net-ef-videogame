@@ -7,13 +7,11 @@ namespace net_ef_videogame
         
         static void Main(string[] args)
         {
-
             using (var db = new VideogameContext())
             {
                 while (true)
                 {
                     Console.WriteLine("Menu:");
-
                     Console.WriteLine("1. Inserisci una nuova software house");
                     Console.WriteLine("2. Inserisci un nuovo videogioco");
                     Console.WriteLine("3. Trova gioco per id");
@@ -21,25 +19,26 @@ namespace net_ef_videogame
                     Console.WriteLine("0. Esci");
 
                     Console.Write("Scelta: ");
-                    int choice = int.Parse(Console.ReadLine());
+                    int choice;
+                    if (!int.TryParse(Console.ReadLine(), out choice))
+                    {
+                        Console.WriteLine("Input non valido. Inserire un numero.");
+                        continue;
+                    }
 
                     switch (choice)
                     {
+                        // creazione software house
                         case 1:
 
                             Console.WriteLine("Inserisci il nome software house:");
                             string nameSoftwareHouse = Console.ReadLine();
-
-                            SoftwareHouse softwareHouse = new SoftwareHouse()
-                            {
-                                Name = nameSoftwareHouse,
-                            };
-
-                            VideogameContext dbSofotwareHouse = new VideogameContext();
-                            dbSofotwareHouse.Add(softwareHouse);
-                            dbSofotwareHouse.SaveChanges();
+                            VideogameManager.AddNewSoftwareHouse(db, nameSoftwareHouse);
+                            Console.WriteLine("Software house aggiunta con successo.");
                             break;
 
+
+                        // creazione gioco
                         case 2:
 
                             Console.WriteLine("Inserisci il nome del videogioco:");
@@ -49,78 +48,91 @@ namespace net_ef_videogame
                             string overviewVideogame = Console.ReadLine();
 
                             Console.WriteLine("Inserisci l'ID della software house che ha prodotto il videogioco:");
-                            int softwareHouseId = int.Parse(Console.ReadLine());
-
-                            Videogame videogame = new Videogame()
+                            int softwareHouseId;
+                            if (!int.TryParse(Console.ReadLine(), out softwareHouseId))
                             {
-                                Name = nameVideogame,
-                                Overview = overviewVideogame,
-                                SoftwarehouseId = softwareHouseId
-                            };
+                                Console.WriteLine("Input non valido per l'ID della software house.");
+                                break;
+                            }
 
-                            VideogameContext dbVideogame = new VideogameContext();
-                            dbVideogame.Add(videogame);
-                            dbVideogame.SaveChanges();
+                            VideogameManager.AddNewVideogame(db, nameVideogame, overviewVideogame, softwareHouseId);
+                            Console.WriteLine("Videogioco aggiunto con successo.");
                             break;
 
+
+                        // ricerca gioco tramite id
                         case 3:
-                            Console.WriteLine("Ricerca videogioco per id");
 
-                            int searchId = int.Parse(Console.ReadLine());
-
-                            var videogameIdquery = db.Videogames.FirstOrDefault(v => v.VideogmaeId == searchId );
-
-                            if (videogameIdquery != null)
+                            Console.WriteLine("Ricerca videogioco per id:");
+                            int searchId;
+                            if (!int.TryParse(Console.ReadLine(), out searchId))
                             {
-                                Console.WriteLine($"Videogioco trovato: {videogameIdquery.Name}");
-                                
+                                Console.WriteLine("Input non valido per l'ID del videogioco.");
+                                break;
+                            }
+
+                            var videogame = VideogameManager.FindGameById(db, searchId);
+                            if (videogame != null)
+                            {
+                                Console.WriteLine($"Videogioco trovato: {videogame.Name}");
                             }
                             else
                             {
                                 Console.WriteLine("Nessun videogioco trovato con l'ID specificato.");
                             }
-
-
                             break;
 
-                        case 4:
-                            Console.WriteLine("Ricerca videogioco per nome");
 
+                        // ricerca gioco tramite nome
+                        case 4:
+
+                            Console.WriteLine("Ricerca videogioco per nome:");
                             string searchName = Console.ReadLine();
 
-                            var videogames = db.Videogames.Where(v => v.Name.ToLower().Contains(searchName.ToLower())).ToList();
+                            var videogames = VideogameManager.FindGameByName(db, searchName);
 
                             if (videogames.Any())
                             {
                                 Console.WriteLine("Videogiochi trovati:");
                                 foreach (var itemVideogame in videogames)
                                 {
-                                    Console.WriteLine($"- {itemVideogame.Name}");
-                                    
+                                    Console.WriteLine($"Nome - {itemVideogame.Name}");
+                                    Console.WriteLine($"Descriione - {itemVideogame.Overview}");
                                 }
                             }
                             else
                             {
                                 Console.WriteLine("Nessun videogioco trovato con il nome specificato.");
                             }
-
                             break;
 
+
+                        // delete
+                        case 5:
+
+                            Console.WriteLine("Elimina videogioco per ID:");
+                            int deleteId;
+                            if (!int.TryParse(Console.ReadLine(), out deleteId))
+                            {
+                                Console.WriteLine("Input non valido per l'ID del videogioco.");
+                                break;
+                            }
+
+                            VideogameManager.DeleteVideogameById(db, deleteId);
+                            break;
+
+                        // uscita dal menu
                         case 0:
                             return;
 
+                        
                         default:
-                            Console.WriteLine("Numero non valido nella scelta.");
+                            Console.WriteLine("Scelta non valida.");
                             break;
                     }
                 }
             }
-        }
-
-        
-
-
-            
+        }    
        
     }
 }

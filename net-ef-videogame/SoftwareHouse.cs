@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace net_ef_videogame
 {
+
     public class SoftwareHouse
     {
         [Key]
