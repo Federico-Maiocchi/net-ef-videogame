@@ -25,8 +25,8 @@ namespace net_ef_videogame
         public string? Overview { get; set; }
 
         // possiamo rinominare il nome della colonna da ReleaseDate -> release_date
-        /*[Column("release_date")]
-        public DateTime ReleaseDate {  get; set; } */
+        [Column("release_date")]
+        public DateTime ReleaseDate {  get; set; } 
 
 
         public int SoftwarehouseId { get; set; }
@@ -38,11 +38,11 @@ namespace net_ef_videogame
 
         }
 
-        public Videogame(int videogmaeId, string name, string? overview, int softwarehouseId)
+        public Videogame(string name, string? overview, DateTime releaseDate, int softwarehouseId)
         {
-            VideogmaeId = videogmaeId;
             Name = name;
             Overview = overview;
+            ReleaseDate = releaseDate;
             SoftwarehouseId = softwarehouseId;
         }
     }

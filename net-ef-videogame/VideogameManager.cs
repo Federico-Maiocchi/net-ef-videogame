@@ -8,56 +8,84 @@ namespace net_ef_videogame
 {
     internal class VideogameManager
     {
-        //metodo per aggiungere una nuova software house
-        public static void AddNewSoftwareHouse(VideogameContext db, string nameSoftwareHouse)
+        // Metodo per aggiungere una nuova software house
+        public static void AddNewSoftwareHouse(string nameSoftwareHouse)
         {
-            var softwareHouse = new SoftwareHouse()
+            using (var db = new VideogameContext())
             {
-                Name = nameSoftwareHouse,
-            };
-
-            db.SoftwareHouses.Add(softwareHouse);
-            db.SaveChanges();
-        }
-
-        //metodo per aggiungere un nuovo videogioco
-        public static void AddNewVideogame(VideogameContext db, string nameVideogame, string overviewVideogame, int softwareHouseId)
-        {
-            var softwareHouse = db.SoftwareHouses.Find(softwareHouseId);
-
-            if (softwareHouse != null)
-            {
-                var videogame = new Videogame()
+                var softwareHouse = new SoftwareHouse()
                 {
-                    Name = nameVideogame,
-                    Overview = overviewVideogame,
-                    SoftwareHouse = softwareHouse
+                    Name = nameSoftwareHouse,
                 };
 
-                db.Videogames.Add(videogame);
+                db.SoftwareHouses.Add(softwareHouse);
                 db.SaveChanges();
             }
         }
 
-        //metodo per trovare un videogioco con il suo id
-        public static Videogame FindGameById(VideogameContext db, int searchId)
-        {
-            return db.Videogames.FirstOrDefault(v => v.VideogmaeId == searchId);
-        }
+        // Metodo per aggiungere un nuovo videogioco
+        //public static void AddNewVideogame(string nameVideogame, string overviewVideogame, int softwareHouseId)
+        //{
+        //    using (var db = new VideogameContext())
+        //    {
+        //        var softwareHouse = db.SoftwareHouses.Find(softwareHouseId);
 
-        //metodo che trova un videogioco per il suo nome
-        public static List<Videogame> FindGameByName(VideogameContext db, string searchName)
-        {
-            return db.Videogames.Where(v => v.Name.ToLower().Contains(searchName.ToLower())).ToList();
-        }
+        //        if (softwareHouse != null)
+        //        {
+        //            var videogame = new Videogame()
+        //            {
+        //                Name = nameVideogame,
+        //                Overview = overviewVideogame,
+        //                SoftwareHouse = softwareHouse
+        //            };
 
-        //metodo per elimare videgioco tramite id
-        public static void DeleteVideogameById(VideogameContext db, int gameId)
-        {
-            var videogameToDelete = db.Videogames.FirstOrDefault(v => v.VideogmaeId == gameId);
+        //            db.Videogames.Add(videogame);
+        //            db.SaveChanges();
+        //        }
+        //    }
+        //}
 
-            db.Videogames.Remove(videogameToDelete);
+        public static void AddNewVideogame(Videogame v)
+        {
+            using VideogameContext db = new VideogameContext();
+            db.Add(v);
             db.SaveChanges();
+        }
+
+        // Metodo per trovare un videogioco con il suo id
+        public static Videogame FindGameById(int searchId)
+        {
+            using (var db = new VideogameContext())
+            {
+                return db.Videogames.FirstOrDefault(v => v.VideogmaeId == searchId);
+            }
+        }
+
+        // Metodo che trova un videogioco per il suo nome
+        public static List<Videogame> FindGameByName(string searchName)
+        {
+            using (var db = new VideogameContext())
+            {
+                return db.Videogames.Where(v => v.Name.ToLower().Contains(searchName.ToLower())).ToList();
+            }
+        }
+
+        // Metodo per eliminare un videogioco tramite id
+        public static bool DeleteVideogameById(int gameId)
+        {
+            using (var db = new VideogameContext())
+            {
+                var videogameToDelete = db.Videogames.FirstOrDefault(v => v.VideogmaeId == gameId);
+
+                if (videogameToDelete != null)
+                {
+                    db.Videogames.Remove(videogameToDelete);
+                    db.SaveChanges();
+                    return true;
+                }
+
+                return false;
+            }
         }
     }
 }
